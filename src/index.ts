@@ -11,6 +11,7 @@ import { init } from "./util/init";
 import { reconnect } from "./util/reconnect";
 import { deviceUpdate } from "./util/deviceUpdate";
 import { getDevices } from "./util/getDevices";
+import { getAllData } from "./util/getAllData";
 import { onDisconnected } from "./util/onDisconnected";
 
 const app = express();
@@ -47,6 +48,9 @@ wss.on("connection", (ws: WebSocket) => {
       } else if (data.head.type === "get_devices") {
         console.log("デバイス情報取得: ", data.body.type);
         getDevices({ data, connectedScreens, connectedDevices, ws });
+      } else if (data.head.type === "getAllData") {
+        console.log("全データ取得: ", data.body.type);
+        getAllData({ data, connectedScreens, connectedDevices, ws });
       } else {
         console.log("通常メッセージ: ", data.head.type);
       }

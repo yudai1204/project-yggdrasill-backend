@@ -13,6 +13,7 @@ export const init = (props: Props) => {
 
   if (data.body.type === "screen") {
     data.body.devices = connectedDevices.map((device) => device.data);
+    data.body.connectedAt = new Date().getTime();
     connectedScreens.push({ ws, data: data.body });
     ws.send(
       JSON.stringify({
@@ -24,14 +25,19 @@ export const init = (props: Props) => {
       })
     );
   } else if (data.body.type === "device") {
+    const newData = {
+      ...data.body,
+      isConnected: true,
+      connectedAt: new Date().getTime(),
+    };
     connectedDevices.push({
       ws,
-      data: { ...data.body, isConnected: true },
+      data: newData,
     });
     ws.send(
       JSON.stringify({
         head: { type: "init", index: connectedDevices.length - 1 },
-        body: { ...data.body, isConnected: true },
+        body: newData,
       } as MessageType)
     );
     connectedScreens.forEach((screen) => {

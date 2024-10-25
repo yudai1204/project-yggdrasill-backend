@@ -2,6 +2,7 @@ import type WebSocket from "ws";
 
 export interface DeviceType {
   type: "user" | "device";
+  connectedAt: number;
   uuid: string;
   size: {
     width: number;
@@ -18,6 +19,7 @@ export interface DeviceType {
 
 export interface ScreenType {
   type: "screen";
+  connectedAt: number;
   uuid: string;
   size: {
     width: number;
@@ -37,4 +39,9 @@ export interface MessageType {
 export interface StoredType<T> {
   ws: WebSocket;
   data: T;
+}
+
+export interface ManagerType {
+  screens: ScreenType[];
+  devices: DeviceType[];
 }
