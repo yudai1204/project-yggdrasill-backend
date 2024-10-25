@@ -14,7 +14,15 @@ export const init = (props: Props) => {
   if (data.body.type === "screen") {
     data.body.devices = connectedDevices.map((device) => device.data);
     connectedScreens.push({ ws, data: data.body });
-    ws.send(JSON.stringify({ head: { type: "init" }, body: data.body }));
+    ws.send(
+      JSON.stringify({
+        head: {
+          type: "init",
+          index: connectedScreens.length - 1,
+        },
+        body: data.body,
+      })
+    );
   } else if (data.body.type === "device") {
     connectedDevices.push({
       ws,

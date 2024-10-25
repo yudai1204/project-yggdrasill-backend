@@ -26,7 +26,15 @@ export const reconnect = (props: Props) => {
       console.log("新規追加");
       data.body.devices = connectedDevices.map((device) => device.data);
       connectedScreens.push({ ws, data: data.body });
-      ws.send(JSON.stringify({ head: { type: "init" }, body: data.body }));
+      ws.send(
+        JSON.stringify({
+          head: {
+            type: "init",
+            index: connectedScreens.length - 1,
+          },
+          body: data.body,
+        })
+      );
     }
   } else if (data.body.type === "device") {
     const device = connectedDevices.find(
@@ -52,7 +60,10 @@ export const reconnect = (props: Props) => {
     connectedScreens.forEach((screen) => {
       screen.ws.send(
         JSON.stringify({
-          head: { type: "devices_update" },
+          head: {
+            type: "devices_update",
+            index: connectedScreens.indexOf(screen),
+          },
           body: connectedDevices.map((device) => device.data),
         })
       );

@@ -13,7 +13,12 @@ export const getDevices = (props: Props) => {
   if (data.body.type === "screen") {
     ws.send(
       JSON.stringify({
-        head: { type: "devices_update" },
+        head: {
+          type: "devices_update",
+          index: connectedScreens.findIndex(
+            (s) => s.data.uuid === data.body.uuid
+          ),
+        },
         body: connectedDevices.map((device) => device.data),
       })
     );

@@ -32,7 +32,10 @@ export const deviceUpdate = (props: Props) => {
     connectedScreens.forEach((screen) => {
       screen.ws.send(
         JSON.stringify({
-          head: { type: "devices_update" },
+          head: {
+            type: "devices_update",
+            index: connectedScreens.indexOf(screen),
+          },
           body: connectedDevices.map((device) => device.data),
         })
       );
@@ -47,7 +50,10 @@ export const deviceUpdate = (props: Props) => {
       connectedScreens.forEach((screen) => {
         screen.ws.send(
           JSON.stringify({
-            head: { type: "devices_update" },
+            head: {
+              type: "devices_update",
+              index: connectedDevices.indexOf(target),
+            },
             body: connectedDevices.map((device) => device.data),
           })
         );

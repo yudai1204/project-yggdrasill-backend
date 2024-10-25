@@ -11,6 +11,7 @@ import { init } from "./util/init";
 import { reconnect } from "./util/reconnect";
 import { deviceUpdate } from "./util/deviceUpdate";
 import { getDevices } from "./util/getDevices";
+import { onDisconnected } from "./util/onDisconnected";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -56,18 +57,6 @@ wss.on("connection", (ws: WebSocket) => {
   });
   ws.on("close", () => {
     console.log("Client disconnected");
-    connectedDevices.forEach((device) => {
-      if (device.ws === ws) {
-        device.data.isConnected = false;
-        connectedScreens.forEach((screen) => {
-          screen.ws.send(
-            JSON.stringify({
-              head: { type: "devices_update" },
-              body: connectedDevices.map((device) => device.data),
-            })
-          );
-        });
-      }
-    });
+    onDisconnected({ connectedScreens, connectedDevices, ws });
   });
 });
