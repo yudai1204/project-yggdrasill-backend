@@ -37,5 +37,21 @@ export const deviceUpdate = (props: Props) => {
         })
       );
     });
+  } else if (data.body.type === "device") {
+    const newDataBody = data.body as DeviceType;
+    const target = connectedDevices.find(
+      (device) => device.data.uuid === newDataBody.uuid
+    );
+    if (target) {
+      target.data = newDataBody;
+      connectedScreens.forEach((screen) => {
+        screen.ws.send(
+          JSON.stringify({
+            head: { type: "devices_update" },
+            body: connectedDevices.map((device) => device.data),
+          })
+        );
+      });
+    }
   }
 };
