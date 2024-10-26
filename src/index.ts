@@ -6,6 +6,7 @@ import type {
   MessageType,
   ScreenType,
   StoredType,
+  ManagerType,
 } from "./util/types";
 import { init } from "./util/init";
 import { reconnect } from "./util/reconnect";
@@ -25,6 +26,7 @@ const wss = new WebSocketServer({ server });
 
 const connectedDevices: StoredType<DeviceType>[] = [];
 const connectedScreens: StoredType<ScreenType>[] = [];
+const managers: StoredType<ManagerType>[] = [];
 
 wss.on("connection", (ws: WebSocket) => {
   console.log("New client connected");
@@ -38,19 +40,25 @@ wss.on("connection", (ws: WebSocket) => {
       // 初回接続処理
       if (data.head.type === "init") {
         console.log("初回接続: ", data.body.type);
-        init({ data, connectedScreens, connectedDevices, ws });
+        init({ data, connectedScreens, connectedDevices, ws, managers });
       } else if (data.head.type === "reconnect") {
         console.log("再接続: ", data.body.type);
-        reconnect({ data, connectedScreens, connectedDevices, ws });
+        reconnect({ data, connectedScreens, connectedDevices, ws, managers });
       } else if (data.head.type === "devices_update") {
         console.log("デバイス情報更新", data.body.type);
-        deviceUpdate({ data, connectedScreens, connectedDevices, ws });
+        deviceUpdate({
+          data,
+          connectedScreens,
+          connectedDevices,
+          ws,
+          managers,
+        });
       } else if (data.head.type === "get_devices") {
         console.log("デバイス情報取得: ", data.body.type);
         getDevices({ data, connectedScreens, connectedDevices, ws });
       } else if (data.head.type === "getAllData") {
         console.log("全データ取得: ", data.body.type);
-        getAllData({ data, connectedScreens, connectedDevices, ws });
+        getAllData({ connectedScreens, connectedDevices, ws });
       } else {
         console.log("通常メッセージ: ", data.head.type);
       }
@@ -61,6 +69,6 @@ wss.on("connection", (ws: WebSocket) => {
   });
   ws.on("close", () => {
     console.log("Client disconnected");
-    onDisconnected({ connectedScreens, connectedDevices, ws });
+    onDisconnected({ connectedScreens, connectedDevices, ws, managers });
   });
 });

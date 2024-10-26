@@ -1,15 +1,23 @@
 import type WebSocket from "ws";
-import type { MessageType, StoredType, ScreenType, DeviceType } from "./types";
+import type {
+  MessageType,
+  StoredType,
+  ScreenType,
+  DeviceType,
+  ManagerType,
+} from "./types";
+import { getAllData } from "./getAllData";
 
 type Props = {
   data: MessageType;
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  managers: StoredType<ManagerType>[];
 };
 
 export const init = (props: Props) => {
-  const { data, connectedScreens, connectedDevices, ws } = props;
+  const { data, connectedScreens, connectedDevices, ws, managers } = props;
 
   if (data.body.type === "screen") {
     data.body.devices = connectedDevices.map((device) => device.data);
@@ -48,6 +56,27 @@ export const init = (props: Props) => {
         })
       );
     });
+  } else if (data.body.type === "manager") {
+    const target = managers.find((m) => m.data.uuid === data.body.uuid);
+    const newData = {
+      ...data.body,
+      screens: connectedScreens.map((screen) => screen.data),
+      devices: connectedDevices.map((device) => device.data),
+    };
+    if (target) {
+      target.ws = ws;
+      target.data = newData;
+    } else {
+      managers.push({ ws, data: newData });
+    }
+    getAllData({ connectedScreens, connectedDevices, ws });
   } else {
+  }
+
+  // manager以外で新規追加があったらmanagerに通知
+  if (data.body.type !== "manager") {
+    managers.forEach((manager) => {
+      getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
+    });
   }
 };

@@ -1,15 +1,23 @@
 import type WebSocket from "ws";
-import type { MessageType, StoredType, ScreenType, DeviceType } from "./types";
+import type {
+  MessageType,
+  StoredType,
+  ScreenType,
+  DeviceType,
+  ManagerType,
+} from "./types";
+import { getAllData } from "./getAllData";
 
 type Props = {
   data: MessageType;
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  managers: StoredType<ManagerType>[];
 };
 
 export const reconnect = (props: Props) => {
-  const { data, connectedScreens, connectedDevices, ws } = props;
+  const { data, connectedScreens, connectedDevices, ws, managers } = props;
   if (data.body.type === "screen") {
     const screen = connectedScreens.find(
       (screen) => screen.data.uuid === data.body.uuid
@@ -67,6 +75,12 @@ export const reconnect = (props: Props) => {
           body: connectedDevices.map((device) => device.data),
         })
       );
+    });
+  }
+  // manager以外で更新があったらmanagerに通知
+  if (data.body.type !== "manager") {
+    managers.forEach((manager) => {
+      getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
     });
   }
 };
