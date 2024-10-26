@@ -7,6 +7,7 @@ import type {
   ScreenType,
   StoredType,
   ManagerType,
+  Mode,
 } from "./util/types";
 import { init } from "./util/init";
 import { reconnect } from "./util/reconnect";
@@ -16,6 +17,7 @@ import { getAllData } from "./util/getAllData";
 import { onDisconnected } from "./util/onDisconnected";
 import { setMode } from "./util/setMode";
 import { screenUpdate } from "./util/screenUpdate";
+import { setDebug } from "./util/setDebug";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -30,7 +32,8 @@ const connectedDevices: StoredType<DeviceType>[] = [];
 const connectedScreens: StoredType<ScreenType>[] = [];
 const managers: StoredType<ManagerType>[] = [];
 
-let mode: "Calibration" | "Operation" = "Calibration";
+let mode: Mode = "Calibration";
+let isDebug: boolean = true;
 
 wss.on("connection", (ws: WebSocket) => {
   console.log("New client connected");
@@ -72,6 +75,17 @@ wss.on("connection", (ws: WebSocket) => {
       } else if (data.head.type === "getAllData") {
         console.log("全データ取得");
         getAllData({ connectedScreens, connectedDevices, ws });
+      } else if (data.head.type === "setDebug") {
+        setDebug({
+          ws,
+          connectedDevices,
+          connectedScreens,
+          managers,
+          // @ts-ignore
+          isDebug: data.body.debug,
+        });
+        // @ts-ignore
+        isDebug = data.body.debug;
       } else if (data.head.type === "setMode") {
         setMode({
           // @ts-ignore
@@ -83,6 +97,13 @@ wss.on("connection", (ws: WebSocket) => {
         });
         // @ts-ignore
         mode = data.body.mode;
+      } else if (data.head.type === "getCurrentSettings") {
+        ws.send(
+          JSON.stringify({
+            head: { type: "getCurrentSettings" },
+            body: { mode, debug: isDebug },
+          })
+        );
       } else {
         console.log("通常メッセージ: ", data.head.type);
       }
