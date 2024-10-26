@@ -7,6 +7,7 @@ import type {
   ManagerType,
 } from "./types";
 import { getAllData } from "./getAllData";
+import { setMainScreen } from "./setMainScreen";
 
 type Props = {
   data: MessageType;
@@ -14,10 +15,18 @@ type Props = {
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
   managers: StoredType<ManagerType>[];
+  setScreenSize: (width: number, height: number) => void;
 };
 
 export const init = (props: Props) => {
-  const { data, connectedScreens, connectedDevices, ws, managers } = props;
+  const {
+    data,
+    connectedScreens,
+    connectedDevices,
+    ws,
+    managers,
+    setScreenSize,
+  } = props;
 
   if (data.body.type === "screen") {
     data.body.devices = connectedDevices.map((device) => device.data);
@@ -32,6 +41,16 @@ export const init = (props: Props) => {
         body: data.body,
       })
     );
+    if (connectedScreens.length === 1) {
+      setMainScreen({
+        data,
+        connectedScreens,
+        connectedDevices,
+        ws,
+        managers,
+        setScreenSize,
+      });
+    }
   } else if (data.body.type === "device") {
     const newData = {
       ...data.body,

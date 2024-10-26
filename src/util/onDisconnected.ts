@@ -17,7 +17,6 @@ type Props = {
 
 export const onDisconnected = (props: Props) => {
   const { ws, connectedScreens, connectedDevices, managers } = props;
-
   managers.forEach((manager) => {
     if (manager.ws === ws) {
       managers.splice(managers.indexOf(manager), 1);
@@ -46,7 +45,6 @@ export const onDisconnected = (props: Props) => {
   });
   connectedScreens.forEach((screen) => {
     if (screen.ws === ws) {
-      connectedScreens.splice(connectedScreens.indexOf(screen), 1);
       console.log("connectedScreens: ", connectedScreens.length);
       connectedScreens.forEach((s) => {
         s.ws.send(

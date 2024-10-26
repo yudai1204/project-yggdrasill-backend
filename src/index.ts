@@ -18,6 +18,7 @@ import { onDisconnected } from "./util/onDisconnected";
 import { setMode } from "./util/setMode";
 import { screenUpdate } from "./util/screenUpdate";
 import { setDebug } from "./util/setDebug";
+import { setMainScreen } from "./util/setMainScreen";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -35,6 +36,14 @@ const managers: StoredType<ManagerType>[] = [];
 let mode: Mode = "Calibration";
 let isDebug: boolean = true;
 
+let screenSize = {
+  width: 1920,
+  height: 1080,
+};
+const setScreenSize = (width: number, height: number) => {
+  screenSize = { width, height };
+};
+
 wss.on("connection", (ws: WebSocket) => {
   console.log("New client connected");
 
@@ -47,10 +56,24 @@ wss.on("connection", (ws: WebSocket) => {
       // 初回接続処理
       if (data.head.type === "init") {
         console.log("初回接続: ", data.body.type);
-        init({ data, connectedScreens, connectedDevices, ws, managers });
+        init({
+          data,
+          connectedScreens,
+          connectedDevices,
+          ws,
+          managers,
+          setScreenSize,
+        });
       } else if (data.head.type === "reconnect") {
         console.log("再接続: ", data.body.type);
-        reconnect({ data, connectedScreens, connectedDevices, ws, managers });
+        reconnect({
+          data,
+          connectedScreens,
+          connectedDevices,
+          ws,
+          managers,
+          setScreenSize,
+        });
       } else if (data.head.type === "devices_update") {
         console.log("デバイス情報更新", data.body.type);
         deviceUpdate({
@@ -97,11 +120,24 @@ wss.on("connection", (ws: WebSocket) => {
         });
         // @ts-ignore
         mode = data.body.mode;
+      } else if (data.head.type === "setMainScreen") {
+        setMainScreen({
+          data,
+          connectedScreens,
+          connectedDevices,
+          managers,
+          ws,
+          setScreenSize,
+        });
       } else if (data.head.type === "getCurrentSettings") {
         ws.send(
           JSON.stringify({
             head: { type: "getCurrentSettings" },
-            body: { mode, debug: isDebug },
+            body: {
+              mode,
+              debug: isDebug,
+              screen: screenSize,
+            },
           })
         );
       } else {
@@ -114,6 +150,11 @@ wss.on("connection", (ws: WebSocket) => {
   });
   ws.on("close", () => {
     console.log("Client disconnected");
-    onDisconnected({ connectedScreens, connectedDevices, ws, managers });
+    onDisconnected({
+      connectedScreens,
+      connectedDevices,
+      ws,
+      managers,
+    });
   });
 });
