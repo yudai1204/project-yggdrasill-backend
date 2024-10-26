@@ -10,6 +10,10 @@ export interface DeviceType {
     width: number;
     height: number;
   };
+  rawSize: {
+    width: number;
+    height: number;
+  };
   rotation: number;
   position: {
     x: number;
