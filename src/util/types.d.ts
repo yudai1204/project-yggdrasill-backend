@@ -1,5 +1,7 @@
 import type WebSocket from "ws";
 
+export type Mode = "Calibration" | "Operation";
+
 export interface DeviceType {
   type: "device";
   connectedAt: number;
