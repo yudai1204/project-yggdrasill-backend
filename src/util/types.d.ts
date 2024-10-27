@@ -71,9 +71,9 @@ export interface UserType {
 export type QrReaderType = {
   type: "qrReader";
   uuid: string;
-  value?: string;
-  size?: number;
-  coordinates?: [number, number][];
+  value: string;
+  size: number;
+  coordinates: [number, number][];
 };
 export interface MessageType {
   head: {
