@@ -73,7 +73,7 @@ export type QrReaderType = {
   uuid: string;
   value: string;
   size: number;
-  coordinates: [number, number][];
+  coordinates: { x: number; y: number }[];
 };
 export interface MessageType {
   head: {

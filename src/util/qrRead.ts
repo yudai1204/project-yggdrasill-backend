@@ -24,8 +24,7 @@ export const qrRead = (props: Props) => {
       console.log("targetが見つかりません");
       return;
     }
-    // 送られてきたサイズからスマホのサイズを更新（マジックナンバーは要変更）
-    target.data.zoom = body.size / 200;
+    target.data.zoom = body.size;
 
     connectedScreens.forEach((screen) => {
       screen.ws.send(
