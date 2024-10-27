@@ -26,6 +26,15 @@ export const qrRead = (props: Props) => {
     }
     target.data.zoom = body.size;
 
+    target.ws.send(
+      JSON.stringify({
+        head: { type: "qrRead" },
+        body: {
+          zoom: body.size,
+        },
+      })
+    );
+
     connectedScreens.forEach((screen) => {
       screen.ws.send(
         JSON.stringify({
