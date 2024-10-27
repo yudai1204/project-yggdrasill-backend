@@ -5,6 +5,7 @@ import type {
   ScreenType,
   DeviceType,
   ManagerType,
+  UserType,
 } from "./types";
 import { getAllData } from "./getAllData";
 import { setMainScreen } from "./setMainScreen";
@@ -14,8 +15,10 @@ type Props = {
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
   setScreenSize: (width: number, height: number) => void;
+  ip?: string;
 };
 
 export const reconnect = (props: Props) => {
@@ -23,9 +26,11 @@ export const reconnect = (props: Props) => {
     data,
     connectedScreens,
     connectedDevices,
+    connectedUsers,
     ws,
     managers,
     setScreenSize,
+    ip = "",
   } = props;
   if (data.body.type === "screen") {
     const screen = connectedScreens.find(
@@ -94,11 +99,29 @@ export const reconnect = (props: Props) => {
         })
       );
     });
+  } else if (data.body.type === "user") {
+    const user = connectedUsers.find(
+      (user) => user.data.uuid === data.body.uuid
+    );
+    if (user) {
+      console.log("上書き処理");
+      user.ws = ws;
+      user.data = data.body;
+      user.data.ip = ip;
+    } else {
+      console.log("新規追加");
+      connectedUsers.push({ ws, data: { ...data.body, ip } });
+    }
   }
   // manager以外で更新があったらmanagerに通知
   if (data.body.type !== "manager") {
     managers.forEach((manager) => {
-      getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
+      getAllData({
+        connectedScreens,
+        connectedDevices,
+        connectedUsers,
+        ws: manager.ws,
+      });
     });
   }
 };

@@ -4,8 +4,8 @@ import type {
   StoredType,
   ScreenType,
   DeviceType,
-  ManagerType,
   UserType,
+  ManagerType,
 } from "./types";
 import { getAllData } from "./getAllData";
 
@@ -18,26 +18,21 @@ type Props = {
   ws: WebSocket;
 };
 
-export const screenUpdate = (props: Props) => {
+export const userUpdate = (props: Props) => {
   const {
     data,
     connectedScreens,
-    managers,
     connectedDevices,
     connectedUsers,
     ws,
+    managers,
   } = props;
-  if (data.body.type === "screen") {
-    const newDataBody = data.body as ScreenType;
-    connectedScreens.forEach((screen) => {
-      if (screen.data.uuid === newDataBody.uuid) {
-        screen.data = newDataBody;
-      }
-    });
-  }
 
-  // manager以外で更新があったらmanagerに通知
-  if (data.body.type !== "manager") {
+  const target = connectedUsers.find(
+    (user) => user.data.uuid === data.body.uuid
+  );
+  if (data.body.type === "user" && target) {
+    target.data = data.body;
     managers.forEach((manager) => {
       getAllData({
         connectedScreens,

@@ -8,6 +8,8 @@ import type {
   StoredType,
   ManagerType,
   Mode,
+  UserType,
+  QrReaderType,
 } from "./util/types";
 import { init } from "./util/init";
 import { reconnect } from "./util/reconnect";
@@ -19,6 +21,8 @@ import { setMode } from "./util/setMode";
 import { screenUpdate } from "./util/screenUpdate";
 import { setDebug } from "./util/setDebug";
 import { setMainScreen } from "./util/setMainScreen";
+import { userUpdate } from "./util/userUpdate";
+import { qrRead } from "./util/qrRead";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -31,7 +35,9 @@ const wss = new WebSocketServer({ server });
 
 const connectedDevices: StoredType<DeviceType>[] = [];
 const connectedScreens: StoredType<ScreenType>[] = [];
+const connectedUsers: StoredType<UserType>[] = [];
 const managers: StoredType<ManagerType>[] = [];
+const qrReaders: StoredType<QrReaderType>[] = [];
 
 let mode: Mode = "Calibration";
 let isDebug: boolean = true;
@@ -44,8 +50,8 @@ const setScreenSize = (width: number, height: number) => {
   screenSize = { width, height };
 };
 
-wss.on("connection", (ws: WebSocket) => {
-  console.log("New client connected");
+wss.on("connection", (ws: WebSocket, request) => {
+  console.log("New client connected: " + request.socket.remoteAddress);
 
   // メッセージ受信時
   ws.on("message", (message) => {
@@ -60,9 +66,12 @@ wss.on("connection", (ws: WebSocket) => {
           data,
           connectedScreens,
           connectedDevices,
+          connectedUsers,
           ws,
           managers,
           setScreenSize,
+          qrReaders,
+          ip: request.socket.remoteAddress,
         });
       } else if (data.head.type === "reconnect") {
         console.log("再接続: ", data.body.type);
@@ -70,9 +79,11 @@ wss.on("connection", (ws: WebSocket) => {
           data,
           connectedScreens,
           connectedDevices,
+          connectedUsers,
           ws,
           managers,
           setScreenSize,
+          ip: request.socket.remoteAddress,
         });
       } else if (data.head.type === "devices_update") {
         console.log("デバイス情報更新", data.body.type);
@@ -80,6 +91,7 @@ wss.on("connection", (ws: WebSocket) => {
           data,
           connectedScreens,
           connectedDevices,
+          connectedUsers,
           ws,
           managers,
         });
@@ -89,15 +101,32 @@ wss.on("connection", (ws: WebSocket) => {
           data,
           connectedScreens,
           connectedDevices,
+          connectedUsers,
           ws,
           managers,
         });
       } else if (data.head.type === "get_devices") {
         console.log("デバイス情報取得: ", data.body.type);
         getDevices({ data, connectedScreens, connectedDevices, ws });
+      } else if (data.head.type === "user_update") {
+        userUpdate({
+          data,
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+          ws,
+          managers,
+        });
+      } else if (data.head.type === "qrData") {
+        qrRead({
+          data,
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+        });
       } else if (data.head.type === "getAllData") {
         console.log("全データ取得");
-        getAllData({ connectedScreens, connectedDevices, ws });
+        getAllData({ connectedScreens, connectedDevices, connectedUsers, ws });
       } else if (data.head.type === "setDebug") {
         setDebug({
           ws,
@@ -153,7 +182,9 @@ wss.on("connection", (ws: WebSocket) => {
     onDisconnected({
       connectedScreens,
       connectedDevices,
+      connectedUsers,
       ws,
+      qrReaders,
       managers,
     });
   });

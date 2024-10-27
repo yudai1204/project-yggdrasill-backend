@@ -5,6 +5,8 @@ import type {
   ScreenType,
   DeviceType,
   ManagerType,
+  UserType,
+  QrReaderType,
 } from "./types";
 import { getAllData } from "./getAllData";
 
@@ -12,14 +14,37 @@ type Props = {
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
+  qrReaders: StoredType<QrReaderType>[];
 };
 
 export const onDisconnected = (props: Props) => {
-  const { ws, connectedScreens, connectedDevices, managers } = props;
+  const {
+    ws,
+    connectedScreens,
+    connectedDevices,
+    connectedUsers,
+    managers,
+    qrReaders,
+  } = props;
+
+  qrReaders.forEach((qrReader) => {
+    if (qrReader.ws === ws) {
+      qrReaders.splice(qrReaders.indexOf(qrReader), 1);
+    }
+  });
+
   managers.forEach((manager) => {
     if (manager.ws === ws) {
       managers.splice(managers.indexOf(manager), 1);
+    }
+    return;
+  });
+
+  connectedUsers.forEach((user) => {
+    if (user.ws === ws) {
+      connectedUsers.splice(connectedUsers.indexOf(user), 1);
     }
   });
 
@@ -37,14 +62,11 @@ export const onDisconnected = (props: Props) => {
           })
         );
       });
-      // managerに通知
-      managers.forEach((manager) => {
-        getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
-      });
     }
   });
   connectedScreens.forEach((screen) => {
     if (screen.ws === ws) {
+      connectedScreens.splice(connectedScreens.indexOf(screen), 1);
       console.log("connectedScreens: ", connectedScreens.length);
       connectedScreens.forEach((s) => {
         s.ws.send(
@@ -57,10 +79,16 @@ export const onDisconnected = (props: Props) => {
           })
         );
       });
-      // managerに通知
-      managers.forEach((manager) => {
-        getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
-      });
     }
+  });
+
+  // managerに通知
+  managers.forEach((manager) => {
+    getAllData({
+      connectedScreens,
+      connectedDevices,
+      connectedUsers,
+      ws: manager.ws,
+    });
   });
 };

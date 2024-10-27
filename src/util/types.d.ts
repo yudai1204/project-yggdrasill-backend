@@ -49,20 +49,38 @@ export interface UserType {
     width: number;
     height: number;
   };
+  rawSize: {
+    width: number;
+    height: number;
+  };
   rotation: number;
   position: {
     x: number;
     y: number;
   };
   zoom: number;
+  ua?: {
+    browser: string;
+    device: string;
+    engine: string;
+    os: string;
+  };
+  ip?: string;
 }
 
+export type QrReaderType = {
+  type: "qrReader";
+  uuid: string;
+  value?: string;
+  size?: number;
+  coordinates?: [number, number][];
+};
 export interface MessageType {
   head: {
     type: string;
     index?: number;
   };
-  body: ScreenType | DeviceType | ManagerType;
+  body: ScreenType | DeviceType | ManagerType | UserType | QrReaderType;
 }
 
 export interface StoredType<T> {

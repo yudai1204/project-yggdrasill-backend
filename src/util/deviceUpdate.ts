@@ -5,6 +5,7 @@ import type {
   ScreenType,
   DeviceType,
   ManagerType,
+  UserType,
 } from "./types";
 import { getAllData } from "./getAllData";
 
@@ -13,11 +14,19 @@ type Props = {
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
 };
 
 export const deviceUpdate = (props: Props) => {
-  const { data, connectedScreens, connectedDevices, ws, managers } = props;
+  const {
+    data,
+    connectedScreens,
+    connectedDevices,
+    connectedUsers,
+    ws,
+    managers,
+  } = props;
   if (data.body.type === "screen") {
     const newDataBody = data.body as ScreenType;
     connectedDevices.forEach((device) => {
@@ -72,7 +81,12 @@ export const deviceUpdate = (props: Props) => {
   // manager以外で更新があったらmanagerに通知
   if (data.body.type !== "manager") {
     managers.forEach((manager) => {
-      getAllData({ connectedScreens, connectedDevices, ws: manager.ws });
+      getAllData({
+        connectedScreens,
+        connectedDevices,
+        connectedUsers,
+        ws: manager.ws,
+      });
     });
   }
 };

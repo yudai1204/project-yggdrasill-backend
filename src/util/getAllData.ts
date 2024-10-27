@@ -1,14 +1,21 @@
 import type WebSocket from "ws";
-import type { MessageType, StoredType, ScreenType, DeviceType } from "./types";
+import type {
+  MessageType,
+  StoredType,
+  ScreenType,
+  DeviceType,
+  UserType,
+} from "./types";
 
 type Props = {
   ws: WebSocket;
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
+  connectedUsers: StoredType<UserType>[];
 };
 
 export const getAllData = (props: Props) => {
-  const { connectedScreens, connectedDevices, ws } = props;
+  const { connectedScreens, connectedDevices, connectedUsers, ws } = props;
 
   ws.send(
     JSON.stringify({
@@ -18,6 +25,7 @@ export const getAllData = (props: Props) => {
       body: {
         screens: connectedScreens.map((screen) => screen.data),
         devices: connectedDevices.map((device) => device.data),
+        users: connectedUsers.map((user) => user.data),
       },
     })
   );
