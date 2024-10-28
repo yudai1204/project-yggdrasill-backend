@@ -12,10 +12,17 @@ type Props = {
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
   connectedUsers: StoredType<UserType>[];
+  connectingCount: number;
 };
 
 export const getAllData = (props: Props) => {
-  const { connectedScreens, connectedDevices, connectedUsers, ws } = props;
+  const {
+    connectedScreens,
+    connectedDevices,
+    connectedUsers,
+    ws,
+    connectingCount,
+  } = props;
 
   ws.send(
     JSON.stringify({
@@ -26,6 +33,7 @@ export const getAllData = (props: Props) => {
         screens: connectedScreens.map((screen) => screen.data),
         devices: connectedDevices.map((device) => device.data),
         users: connectedUsers.map((user) => user.data),
+        connectingCount,
       },
     })
   );

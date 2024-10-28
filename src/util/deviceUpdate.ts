@@ -16,6 +16,7 @@ type Props = {
   connectedDevices: StoredType<DeviceType>[];
   connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
+  connectingCount: number;
 };
 
 export const deviceUpdate = (props: Props) => {
@@ -25,6 +26,7 @@ export const deviceUpdate = (props: Props) => {
     connectedDevices,
     connectedUsers,
     ws,
+    connectingCount,
     managers,
   } = props;
   if (data.body.type === "screen") {
@@ -86,6 +88,7 @@ export const deviceUpdate = (props: Props) => {
         connectedDevices,
         connectedUsers,
         ws: manager.ws,
+        connectingCount,
       });
     });
   }

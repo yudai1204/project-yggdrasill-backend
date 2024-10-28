@@ -16,6 +16,7 @@ type Props = {
   connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
   ws: WebSocket;
+  connectingCount: number;
 };
 
 export const screenUpdate = (props: Props) => {
@@ -26,6 +27,7 @@ export const screenUpdate = (props: Props) => {
     connectedDevices,
     connectedUsers,
     ws,
+    connectingCount,
   } = props;
   if (data.body.type === "screen") {
     const newDataBody = data.body as ScreenType;
@@ -44,6 +46,7 @@ export const screenUpdate = (props: Props) => {
         connectedDevices,
         connectedUsers,
         ws: manager.ws,
+        connectingCount,
       });
     });
   }

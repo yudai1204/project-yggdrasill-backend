@@ -20,6 +20,7 @@ type Props = {
   qrReaders: StoredType<QrReaderType>[];
   managers: StoredType<ManagerType>[];
   setScreenSize: (width: number, height: number) => void;
+  connectingCount: number;
   ip?: string;
 };
 
@@ -33,6 +34,7 @@ export const init = (props: Props) => {
     ws,
     managers,
     setScreenSize,
+    connectingCount,
     ip = "",
   } = props;
 
@@ -96,7 +98,13 @@ export const init = (props: Props) => {
     } else {
       managers.push({ ws, data: newData });
     }
-    getAllData({ connectedScreens, connectedDevices, connectedUsers, ws });
+    getAllData({
+      connectedScreens,
+      connectedDevices,
+      connectedUsers,
+      ws,
+      connectingCount,
+    });
   } else if (data.body.type === "user") {
     const target = connectedUsers.find((u) => u.data.uuid === data.body.uuid);
     const newData = {
@@ -134,6 +142,7 @@ export const init = (props: Props) => {
         connectedDevices,
         connectedUsers,
         ws: manager.ws,
+        connectingCount,
       });
     });
   }

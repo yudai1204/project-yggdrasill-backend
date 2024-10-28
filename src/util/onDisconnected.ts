@@ -17,6 +17,7 @@ type Props = {
   connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
   qrReaders: StoredType<QrReaderType>[];
+  connectingCount: number;
 };
 
 export const onDisconnected = (props: Props) => {
@@ -27,6 +28,7 @@ export const onDisconnected = (props: Props) => {
     connectedUsers,
     managers,
     qrReaders,
+    connectingCount,
   } = props;
 
   qrReaders.forEach((qrReader) => {
@@ -89,6 +91,7 @@ export const onDisconnected = (props: Props) => {
       connectedDevices,
       connectedUsers,
       ws: manager.ws,
+      connectingCount,
     });
   });
 };

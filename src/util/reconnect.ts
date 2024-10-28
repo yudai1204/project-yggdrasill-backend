@@ -19,6 +19,7 @@ type Props = {
   managers: StoredType<ManagerType>[];
   setScreenSize: (width: number, height: number) => void;
   ip?: string;
+  connectingCount: number;
 };
 
 export const reconnect = (props: Props) => {
@@ -30,6 +31,7 @@ export const reconnect = (props: Props) => {
     ws,
     managers,
     setScreenSize,
+    connectingCount,
     ip = "",
   } = props;
   if (data.body.type === "screen") {
@@ -121,6 +123,7 @@ export const reconnect = (props: Props) => {
         connectedDevices,
         connectedUsers,
         ws: manager.ws,
+        connectingCount,
       });
     });
   }

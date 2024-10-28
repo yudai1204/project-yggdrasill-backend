@@ -16,6 +16,7 @@ type Props = {
   connectedUsers: StoredType<UserType>[];
   managers: StoredType<ManagerType>[];
   ws: WebSocket;
+  connectingCount: number;
 };
 
 export const userUpdate = (props: Props) => {
@@ -26,6 +27,7 @@ export const userUpdate = (props: Props) => {
     connectedUsers,
     ws,
     managers,
+    connectingCount,
   } = props;
 
   const target = connectedUsers.find(
@@ -39,6 +41,7 @@ export const userUpdate = (props: Props) => {
         connectedDevices,
         connectedUsers,
         ws: manager.ws,
+        connectingCount,
       });
     });
   }

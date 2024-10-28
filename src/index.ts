@@ -50,8 +50,16 @@ const setScreenSize = (width: number, height: number) => {
   screenSize = { width, height };
 };
 
+let connectingCount = 0;
+
 wss.on("connection", (ws: WebSocket, request) => {
-  console.log("New client connected: " + request.socket.remoteAddress);
+  connectingCount++;
+  console.log(
+    "New client [" +
+      connectingCount +
+      "] connected: " +
+      request.socket.remoteAddress
+  );
 
   // メッセージ受信時
   ws.on("message", (message) => {
@@ -72,6 +80,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           setScreenSize,
           qrReaders,
           ip: request.socket.remoteAddress,
+          connectingCount,
         });
       } else if (data.head.type === "reconnect") {
         console.log("再接続: ", data.body.type);
@@ -84,6 +93,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           managers,
           setScreenSize,
           ip: request.socket.remoteAddress,
+          connectingCount,
         });
       } else if (data.head.type === "devices_update") {
         console.log("デバイス情報更新", data.body.type);
@@ -94,6 +104,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           connectedUsers,
           ws,
           managers,
+          connectingCount,
         });
       } else if (data.head.type === "screens_update") {
         console.log("スクリーン情報更新", data.body.type);
@@ -104,6 +115,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           connectedUsers,
           ws,
           managers,
+          connectingCount,
         });
       } else if (data.head.type === "get_devices") {
         console.log("デバイス情報取得: ", data.body.type);
@@ -116,6 +128,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           connectedUsers,
           ws,
           managers,
+          connectingCount,
         });
       } else if (data.head.type === "qrData") {
         qrRead({
@@ -126,7 +139,13 @@ wss.on("connection", (ws: WebSocket, request) => {
         });
       } else if (data.head.type === "getAllData") {
         console.log("全データ取得");
-        getAllData({ connectedScreens, connectedDevices, connectedUsers, ws });
+        getAllData({
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+          ws,
+          connectingCount,
+        });
       } else if (data.head.type === "setDebug") {
         setDebug({
           ws,
@@ -178,7 +197,8 @@ wss.on("connection", (ws: WebSocket, request) => {
     }
   });
   ws.on("close", () => {
-    console.log("Client disconnected");
+    connectingCount--;
+    console.log("Client disconnected. Now Connecting: ", connectingCount);
     onDisconnected({
       connectedScreens,
       connectedDevices,
@@ -186,6 +206,7 @@ wss.on("connection", (ws: WebSocket, request) => {
       ws,
       qrReaders,
       managers,
+      connectingCount,
     });
   });
 });
