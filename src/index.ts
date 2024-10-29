@@ -23,6 +23,8 @@ import { setDebug } from "./util/setDebug";
 import { setMainScreen } from "./util/setMainScreen";
 import { userUpdate } from "./util/userUpdate";
 import { qrRead } from "./util/qrRead";
+import { userReady } from "./util/userReady";
+import { sendJoroStatus } from "./util/sendJoroStatus";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -188,6 +190,26 @@ wss.on("connection", (ws: WebSocket, request) => {
             },
           })
         );
+      } else if (data.head.type === "user_ready") {
+        userReady({
+          data,
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+          ws,
+          managers,
+          connectingCount,
+        });
+      } else if (data.head.type === "joro_status") {
+        sendJoroStatus({
+          data,
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+          ws,
+          managers,
+          connectingCount,
+        });
       } else {
         console.log("通常メッセージ: ", data.head.type);
       }

@@ -70,6 +70,7 @@ export interface UserType {
     gptAnalysis: GptAnalysis;
     answers: (string | undefined)[];
   };
+  ready: boolean;
 }
 
 export type QrReaderType = {
@@ -79,12 +80,24 @@ export type QrReaderType = {
   size: number;
   coordinates: { x: number; y: number }[];
 };
+
+export type JoroType = {
+  type: "joro";
+  uuid: string;
+  isWatering: boolean; // 注いでいるかどうか
+};
 export interface MessageType {
   head: {
     type: string;
     index?: number;
   };
-  body: ScreenType | DeviceType | ManagerType | UserType | QrReaderType;
+  body:
+    | ScreenType
+    | DeviceType
+    | ManagerType
+    | UserType
+    | QrReaderType
+    | JoroType;
 }
 
 export interface StoredType<T> {
