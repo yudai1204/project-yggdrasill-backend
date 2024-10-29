@@ -71,6 +71,7 @@ export interface UserType {
     answers: (string | undefined)[];
   };
   ready: boolean;
+  animationStartFrom?: number;
 }
 
 export type QrReaderType = {
