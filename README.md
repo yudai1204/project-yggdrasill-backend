@@ -4,6 +4,16 @@
 
 ## Azure Container Apps への再デプロイ手順
 
+0. Azure CLI でログイン
+
+```
+az login
+```
+
+```
+az acr login --name $REGISTRY_NAME
+```
+
 1. Docker イメージの再ビルド
    latest タグを再利用しても良いですが、バージョン管理しやすくするために v1.1 や 2024-10-29 のように新しいタグを追加するのもおすすめです。例: `docker build -t yggdrasil:v1.1 .`
 
