@@ -26,6 +26,7 @@ import { qrRead } from "./util/qrRead";
 import { userReady } from "./util/userReady";
 import { sendJoroStatus } from "./util/sendJoroStatus";
 import { animationStart } from "./util/animationStart";
+import { resetToWaiting } from "./util/resetToWaiting";
 
 const app = express();
 const PORT = process.env.PORT || 3210;
@@ -213,6 +214,16 @@ wss.on("connection", (ws: WebSocket, request) => {
         });
       } else if (data.head.type === "animation_start") {
         animationStart({
+          data,
+          connectedScreens,
+          connectedDevices,
+          connectedUsers,
+          ws,
+          managers,
+          connectingCount,
+        });
+      } else if (data.head.type === "resetToWaiting") {
+        resetToWaiting({
           data,
           connectedScreens,
           connectedDevices,

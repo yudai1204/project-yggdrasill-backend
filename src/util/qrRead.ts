@@ -42,6 +42,7 @@ export const qrRead = (props: Props) => {
           body: {
             zoom: target.data.zoom,
             value: body.value,
+            size: target.data.size,
           },
         })
       );
