@@ -7,7 +7,6 @@ import type {
   ManagerType,
   UserType,
 } from "./types";
-import { getAllData } from "./getAllData";
 
 type Props = {
   data: MessageType;
@@ -45,12 +44,8 @@ export const sendJoroStatus = (props: Props) => {
       user.ws.send(json);
     });
 
-    getAllData({
-      connectedScreens,
-      connectedDevices,
-      connectedUsers,
-      ws: ws,
-      connectingCount,
+    managers.forEach((manager) => {
+      manager.ws.send(json);
     });
   }
 };

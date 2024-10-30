@@ -42,11 +42,7 @@ export const resetToWaiting = (props: Props) => {
     device.ws.send(json);
   });
 
-  getAllData({
-    connectedScreens,
-    connectedDevices,
-    connectedUsers,
-    ws: ws,
-    connectingCount,
+  managers.forEach((manager) => {
+    manager.ws.send(json);
   });
 };

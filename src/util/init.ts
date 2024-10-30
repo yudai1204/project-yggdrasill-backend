@@ -41,6 +41,7 @@ export const init = (props: Props) => {
   if (data.body.type === "screen") {
     data.body.devices = connectedDevices.map((device) => device.data);
     data.body.connectedAt = new Date().getTime();
+    data.body.timeOffset.serverTime = new Date().getTime();
     connectedScreens.push({ ws, data: data.body });
     ws.send(
       JSON.stringify({
@@ -66,6 +67,10 @@ export const init = (props: Props) => {
       ...data.body,
       isConnected: true,
       connectedAt: new Date().getTime(),
+      timeOffset: {
+        ...data.body.timeOffset,
+        serverTime: new Date().getTime(),
+      },
     };
     connectedDevices.push({
       ws,
@@ -111,6 +116,10 @@ export const init = (props: Props) => {
       ...data.body,
       connectedAt: new Date().getTime(),
       ip,
+      timeOffset: {
+        ...data.body.timeOffset,
+        serverTime: new Date().getTime(),
+      },
     };
     if (target) {
       target.ws = ws;

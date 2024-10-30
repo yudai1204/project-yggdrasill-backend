@@ -7,7 +7,6 @@ import type {
   UserType,
   ManagerType,
 } from "./types";
-import { getAllData } from "./getAllData";
 
 type Props = {
   data: MessageType;
@@ -61,13 +60,16 @@ export const userReady = (props: Props) => {
       );
     });
     managers.forEach((manager) => {
-      getAllData({
-        connectedScreens,
-        connectedDevices,
-        connectedUsers,
-        ws: manager.ws,
-        connectingCount,
-      });
+      manager.ws.send(
+        JSON.stringify({
+          head: {
+            type: "user_ready",
+          },
+          body: {
+            user: data.body,
+          },
+        })
+      );
     });
   }
 };

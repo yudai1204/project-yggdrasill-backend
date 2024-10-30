@@ -140,6 +140,7 @@ wss.on("connection", (ws: WebSocket, request) => {
           connectedScreens,
           connectedDevices,
           connectedUsers,
+          managers,
         });
       } else if (data.head.type === "getAllData") {
         console.log("全データ取得");

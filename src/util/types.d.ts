@@ -5,6 +5,11 @@ export type Mode = "Calibration" | "Operation";
 export interface DeviceType {
   type: "device";
   connectedAt: number;
+  timeOffset: {
+    value: number;
+    begin: number;
+    serverTime: number;
+  };
   uuid: string;
   size: {
     width: number;
@@ -26,6 +31,11 @@ export interface DeviceType {
 export interface ScreenType {
   type: "screen";
   connectedAt: number;
+  timeOffset: {
+    value: number;
+    begin: number;
+    serverTime: number;
+  };
   uuid: string;
   size: {
     width: number;
@@ -45,6 +55,11 @@ export interface UserType {
   type: "user";
   uuid: string;
   connectedAt: number;
+  timeOffset: {
+    value: number;
+    begin: number;
+    serverTime: number;
+  };
   size: {
     width: number;
     height: number;

@@ -5,6 +5,7 @@ import type {
   StoredType,
   UserType,
   QrReaderType,
+  ManagerType,
 } from "./types";
 
 type Props = {
@@ -12,9 +13,11 @@ type Props = {
   connectedScreens: StoredType<ScreenType>[];
   connectedDevices: StoredType<DeviceType>[];
   connectedUsers: StoredType<UserType>[];
+  managers: StoredType<ManagerType>[];
 };
 export const qrRead = (props: Props) => {
-  const { data, connectedScreens, connectedDevices, connectedUsers } = props;
+  const { data, connectedScreens, connectedDevices, connectedUsers, managers } =
+    props;
   console.log("QRコード読み取り: ", data.body.type);
   if (data.body.type === "qrReader") {
     // スマホデータを更新する
@@ -37,6 +40,19 @@ export const qrRead = (props: Props) => {
 
     connectedScreens.forEach((screen) => {
       screen.ws.send(
+        JSON.stringify({
+          head: { type: "spPosition" },
+          body: {
+            zoom: target.data.zoom,
+            value: body.value,
+            size: target.data.size,
+          },
+        })
+      );
+    });
+
+    managers.forEach((manager) => {
+      manager.ws.send(
         JSON.stringify({
           head: { type: "spPosition" },
           body: {
