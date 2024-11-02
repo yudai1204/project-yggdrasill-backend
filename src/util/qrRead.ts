@@ -27,13 +27,13 @@ export const qrRead = (props: Props) => {
       console.log("targetが見つかりません");
       return;
     }
-    target.data.zoom = body.size;
+    target.data.zoom = body.size / target.data.size.height;
 
     target.ws.send(
       JSON.stringify({
         head: { type: "qrRead" },
         body: {
-          zoom: body.size,
+          zoom: target.data.zoom,
         },
       })
     );
